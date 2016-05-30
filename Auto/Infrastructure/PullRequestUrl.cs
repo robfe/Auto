@@ -12,13 +12,13 @@ namespace Auto.Infrastructure
 			if (match.Success)
 			{
 				Success = true;
-				Org = match.Groups[1].Value;
+				Owner = match.Groups[1].Value;
 				Repo = match.Groups[2].Value;
 				Ticket = int.Parse(match.Groups[3].Value);
 			}
 		}
 
-		public string Org { get; }
+		public string Owner { get; }
 		public string Repo { get; }
 		public int Ticket { get; }
 		public bool Success { get; }

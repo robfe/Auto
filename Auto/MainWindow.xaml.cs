@@ -1,20 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Reactive.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Forms;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Auto.Core.Viewmodels;
+using Auto.Core.Viewmodels.DropTargets;
 using ReactiveUI;
 using DragEventArgs = System.Windows.DragEventArgs;
 using Rectangle = System.Drawing.Rectangle;
@@ -51,14 +41,21 @@ namespace Auto
 			_vm.HoveredUrl = null;
 		}
 
-		void MainWindow_OnDrop(object sender, DragEventArgs e)
-		{
-			_vm.Drop();
-		}
-
 		void MainWindow_OnMouseRightButtonDown(object sender, MouseButtonEventArgs e)
 		{
 			_vm.State = MainState.Settings;
+		}
+
+		void UIElement_OnDrop(object sender, DragEventArgs e)
+		{
+			var s = e.Data.GetData(typeof (string)).ToString();
+			var dc = ((FrameworkElement) sender).DataContext as  DropTargetBase;
+			_vm.Process(dc, s);
+		}
+
+		void MainWindow_OnDrop(object sender, DragEventArgs e)
+		{
+			_vm.State = MainState.Collapsed;
 		}
 	}
 }

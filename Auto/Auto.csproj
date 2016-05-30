@@ -113,8 +113,13 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Core\Viewmodels\DropTargetBase.cs" />
+    <Compile Include="Core\Viewmodels\DropTargets\ApproveDropTarget.cs" />
+    <Compile Include="Core\Viewmodels\DropTargets\DropTargetBase.cs" />
+    <Compile Include="Core\Viewmodels\DropTargets\PollinateDropTarget.cs" />
+    <Compile Include="Core\Viewmodels\DropTargets\PullRequestDropTargetBase.cs" />
+    <Compile Include="Core\Viewmodels\DropTargets\TestDropTarget.cs" />
     <Compile Include="Core\Viewmodels\MainViewModel.cs" />
+    <Compile Include="Core\Viewmodels\DropTargets\QuestionDropTarget.cs" />
     <Compile Include="Infrastructure\PullRequestUrl.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Infrastructure\GitClerk.cs" />
@@ -156,7 +161,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="FodyWeavers.xml" />
+    <Resource Include="FodyWeavers.xml">
+      <SubType>Designer</SubType>
+    </Resource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Fody.1.28.3\build\Fody.targets" Condition="Exists('..\packages\Fody.1.28.3\build\Fody.targets')" />

@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reactive;
 using System.Threading.Tasks;
+using System.Windows;
+using Auto.Core.Viewmodels.DropTargets;
 using Auto.Infrastructure;
 using Auto.Properties;
 using ReactiveUI;
@@ -10,23 +14,28 @@ namespace Auto.Core.Viewmodels
 {
 	public class MainViewModel : ReactiveObject
 	{
+		readonly DropTargetBase[] _targets =
+		{
+			new TestDropTarget(),
+			new PollinateDropTarget(),
+			new QuestionDropTarget(),
+			new ApproveDropTarget(),
+		};
+		readonly ReactiveList<DropTargetBase> _dropTargets = new ReactiveList<DropTargetBase>();
+
 		public MainViewModel()
 		{
 			GithubToken = Settings.Default.GithubToken;
 
 			this.WhenAnyValue(x => x.HoveredUrl).Subscribe(x =>
 			{
-				var m = new PullRequestUrl(x);
-				if (m.Success)
+				using (_dropTargets.SuppressChangeNotifications())
 				{
-					State = MainState.Expanded;
-					TicketNumber = m.Ticket.ToString();
+					_dropTargets.Clear();
+					_dropTargets.AddRange(_targets.Where(t => t.CanProcess(x)));
 				}
-				else
-				{
-					State = MainState.Collapsed;
-					TicketNumber = "";
-				}
+				State = DropTargets.Any() ? MainState.Expanded : MainState.Collapsed;
+
 			});
 
 			SaveSettings = ReactiveCommand.CreateAsyncTask(x =>
@@ -45,21 +54,30 @@ namespace Auto.Core.Viewmodels
 		public MainState State { get; set; }
 
 		[Reactive]
-		public string TicketNumber { get; set; }
-
-		[Reactive]
 		public string GithubToken { get; set; }
 
 		public ReactiveCommand<Unit> SaveSettings { get; }
 
-		public void Drop()
+		public ICollection<DropTargetBase> DropTargets
 		{
-			if (State == MainState.Expanded)
+			get { return _dropTargets; }
+		}
+
+		public async void Process(DropTargetBase dc, string s)
+		{
+			_dropTargets.Clear();
+			try
 			{
-				var p = new PullRequestUrl(HoveredUrl);
-				GitClerk.Approve(p.Org, p.Repo, p.Ticket).ContinueWith(x => Console.WriteLine(x.Status));
+				if (dc != null)
+				{
+					await dc.Process(s);
+				}
 			}
-			HoveredUrl = null;
+			catch (Exception ex)
+			{
+				MessageBox.Show("Error " + ex.Message);
+			}
+			State = MainState.Collapsed;
 		}
 	}
 

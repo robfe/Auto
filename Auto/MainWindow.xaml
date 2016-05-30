@@ -2,6 +2,7 @@
 		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:ec="http://schemas.microsoft.com/expression/2010/controls"
 		x:Class="Auto.MainWindow"
 		mc:Ignorable="d"
 		Background="Transparent"
@@ -20,6 +21,39 @@
 		Drop="MainWindow_OnDrop"
 		MouseRightButtonDown="MainWindow_OnMouseRightButtonDown"
 		d:DataContext="{d:DesignData /SampleData/MainViewModelSampleData.xaml}">
+	<Window.Resources>
+		<DataTemplate x:Key="DropTargetTemplate">
+			<Canvas Height="23"
+					Width="46">
+				<Border CornerRadius="5"
+						Padding="5"
+						RenderTransformOrigin="0,0.5"
+						AllowDrop="True"
+						DragEnter="MainWindow_OnDragEnter"
+						DragLeave="MainWindow_OnDragLeave"
+						Drop="UIElement_OnDrop"
+						Canvas.Left="23
+						"
+						Canvas.Top="0"
+						Height="46">
+					<Border.RenderTransform>
+						<TransformGroup>
+							<ScaleTransform />
+							<SkewTransform />
+							<RotateTransform Angle="-90" />
+							<TranslateTransform />
+						</TransformGroup>
+					</Border.RenderTransform>
+					<Border.Background>
+						<SolidColorBrush Color="{Binding Color}" />
+					</Border.Background>
+					<TextBlock Text="{Binding Title}"
+							   FontSize="26.667"
+							   d:LayoutOverrides="LeftPosition, RightPosition, TopPosition, BottomPosition" />
+				</Border>
+			</Canvas>
+		</DataTemplate>
+	</Window.Resources>
 	<Grid x:Name="LayoutRoot">
 		<VisualStateManager.VisualStateGroups>
 			<VisualStateGroup x:Name="DragStateGroup">
@@ -43,10 +77,10 @@
 							<EasingDoubleKeyFrame KeyTime="0"
 												  Value="0" />
 						</DoubleAnimationUsingKeyFrames>
-						<DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)"
-													   Storyboard.TargetName="SettingsRoot">
+						<DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(ec:PathListBox.LayoutPaths)[0].(ec:LayoutPath.Span)"
+													   Storyboard.TargetName="pathListBox">
 							<EasingDoubleKeyFrame KeyTime="0"
-												  Value="0" />
+												  Value="0.7" />
 						</DoubleAnimationUsingKeyFrames>
 					</Storyboard>
 				</VisualState>
@@ -71,11 +105,6 @@
 													   Storyboard.TargetName="ExpandedRoot">
 							<EasingDoubleKeyFrame KeyTime="0"
 												  Value="0.1" />
-						</DoubleAnimationUsingKeyFrames>
-						<DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)"
-													   Storyboard.TargetName="SettingsRoot">
-							<EasingDoubleKeyFrame KeyTime="0"
-												  Value="0" />
 						</DoubleAnimationUsingKeyFrames>
 					</Storyboard>
 				</VisualState>
@@ -114,11 +143,28 @@
 				  Stretch="Fill"
 				  VerticalAlignment="Top"
 				  Width="350"
-				  Fill="#FF9EE0FF" />
-			<TextBlock Text="{Binding TicketNumber}"
-					   HorizontalAlignment="Left"
-					   VerticalAlignment="Top"
-					   FontSize="64" />
+				  Fill="#FF9EE0FF"
+				  ToolTip="Right click for settings, drag a URL over for commands"
+				  d:IsHidden="True" />
+			<Path x:Name="arc"
+				  Data="M50,0 L50,0 C48,27.6 27.6,48 0,50 L0,50"
+				  HorizontalAlignment="Left"
+				  Height="200"
+				  Stretch="Fill"
+				  VerticalAlignment="Top"
+				  Width="200" />
+			<ec:PathListBox x:Name="pathListBox"
+							ItemsSource="{Binding DropTargets}"
+							ItemTemplate="{DynamicResource DropTargetTemplate}"
+							AllowDrop="False">
+				<ec:PathListBox.LayoutPaths>
+					<ec:LayoutPath SourceElement="{Binding ElementName=arc}"
+								   Orientation="OrientToPath"
+								   Padding="5"
+								   Start="0.1"
+								   Span="0.8" />
+				</ec:PathListBox.LayoutPaths>
+			</ec:PathListBox>
 		</Grid>
 		<Border x:Name="SettingsRoot"
 				HorizontalAlignment="Center"
@@ -128,13 +174,14 @@
 				Background="White"
 				CornerRadius="5"
 				Padding="10"
-				BorderThickness="1">
+				BorderThickness="1"
+				d:IsHidden="True">
 			<Border.RenderTransform>
 				<TransformGroup>
 					<ScaleTransform />
 					<SkewTransform />
 					<RotateTransform />
-					<TranslateTransform/>
+					<TranslateTransform />
 				</TransformGroup>
 			</Border.RenderTransform>
 			<StackPanel HorizontalAlignment="Center"
@@ -145,7 +192,7 @@
 						 Margin="3" />
 				<Button Content="Save"
 						Margin="3"
-						Command="{Binding SaveSettings}"/>
+						Command="{Binding SaveSettings}" />
 			</StackPanel>
 		</Border>
 	</Grid>

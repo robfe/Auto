@@ -1,2 +1,22 @@
 ﻿<Viewmodels:MainViewModel xmlns:Viewmodels="clr-namespace:Auto.Core.Viewmodels"
-						  TicketNumber="4456" GithubToken="Token" />
+						  xmlns:dropTargets="clr-namespace:Auto.Core.Viewmodels.DropTargets"
+						  GithubToken="Token">
+	<Viewmodels:MainViewModel.DropTargets>
+		<dropTargets:TestDropTarget Color="Red" Title="Foo1"></dropTargets:TestDropTarget>
+		<dropTargets:TestDropTarget Color="Green" Title="Foo2"></dropTargets:TestDropTarget>
+		<dropTargets:TestDropTarget Color="Blue"
+								   Title="Foo3Foo3Foo3Foo3"></dropTargets:TestDropTarget>
+		<dropTargets:TestDropTarget Color="Red"
+								   Title="Foo1"></dropTargets:TestDropTarget>
+		<dropTargets:TestDropTarget Color="Green"
+								   Title="Foo2"></dropTargets:TestDropTarget>
+		<dropTargets:TestDropTarget Color="Blue"
+								   Title="Foo3Foo3Foo3Foo3"></dropTargets:TestDropTarget>
+		<dropTargets:TestDropTarget Color="Red"
+								   Title="Foo1"></dropTargets:TestDropTarget>
+		<dropTargets:TestDropTarget Color="Green"
+								   Title="Foo2"></dropTargets:TestDropTarget>
+		<dropTargets:TestDropTarget Color="ORange"
+								   Title="Foo3Foo3Foo3Foo3"></dropTargets:TestDropTarget>
+	</Viewmodels:MainViewModel.DropTargets>
+</Viewmodels:MainViewModel>
