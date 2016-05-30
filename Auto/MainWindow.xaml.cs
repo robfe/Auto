@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -13,6 +14,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Auto.Core.Viewmodels;
+using ReactiveUI;
 using DragEventArgs = System.Windows.DragEventArgs;
 using Rectangle = System.Drawing.Rectangle;
 
@@ -23,32 +26,39 @@ namespace Auto
 	/// </summary>
 	public partial class MainWindow : Window
 	{
+		MainViewModel _vm;
+
 		public MainWindow()
 		{
 			InitializeComponent();
-			In.GoToState(LayoutRoot, false);
+
 			Left = Screen.AllScreens.Select(screen => screen.Bounds)
 				.Aggregate(Rectangle.Union)
 				.Left;
-		}
 
-		void MainWindow_OnMouseDown(object sender, MouseButtonEventArgs e)
-		{
-			if (e.ChangedButton == MouseButton.Left)
-			{
-				this.DragMove();
-			}
-			
+			DataContext = _vm = new MainViewModel();
+
+			_vm.WhenAnyValue(x => x.State).Subscribe(x => VisualStateManager.GoToElementState(LayoutRoot, x.ToString(), true));
 		}
 
 		void MainWindow_OnDragEnter(object sender, DragEventArgs e)
 		{
-			Out.GoToState(LayoutRoot);
+			_vm.HoveredUrl = e.Data.GetData(typeof (string)).ToString();
 		}
 
 		void MainWindow_OnDragLeave(object sender, DragEventArgs e)
 		{
-			In.GoToState(LayoutRoot);
+			_vm.HoveredUrl = null;
+		}
+
+		void MainWindow_OnDrop(object sender, DragEventArgs e)
+		{
+			_vm.Drop();
+		}
+
+		void MainWindow_OnMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+		{
+			_vm.State = MainState.Settings;
 		}
 	}
 }

@@ -1,0 +1,2 @@
+﻿<Viewmodels:MainViewModel xmlns:Viewmodels="clr-namespace:Auto.Core.Viewmodels"
+						  TicketNumber="4456" GithubToken="Token" />
