@@ -1,10 +1,14 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Media;
 using Auto.Infrastructure;
+using Octokit;
 
 namespace Auto.Core.Viewmodels.DropTargets
 {
-	class QuestionDropTarget : PullRequestDropTargetBase
+	public class QuestionDropTarget : PullRequestDropTargetBase
 	{
 		public QuestionDropTarget():base("Question")
 		{
@@ -15,9 +19,7 @@ namespace Auto.Core.Viewmodels.DropTargets
 		{
 			var p = new PullRequestUrl(data);
 			var c = GitClerk.CreateClient();
-			return Task.WhenAll(
-				c.Issue.Labels.RemoveFromIssue(p.Owner, p.Repo, p.Ticket, "ready for review"),
-				c.Issue.Labels.AddToIssue(p.Owner, p.Repo, p.Ticket, new[] { "question" }));
+			return UpdateLabels(c, p, new[] {"ready for review", "ready to land", "comments addressed"}, new[] { "question" });
 		}
 	}
 }

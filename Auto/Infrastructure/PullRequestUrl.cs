@@ -4,7 +4,7 @@ namespace Auto.Infrastructure
 {
 	public class PullRequestUrl
 	{
-		static Regex Pattern = new Regex(@"https://github.com/(\w+)/(\w+)/pull/(\d+)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+		static Regex Pattern = new Regex(@"https://github.com/([\w.]+)/([\w.]+)/pull/(\d+)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
 		public PullRequestUrl(string s)
 		{

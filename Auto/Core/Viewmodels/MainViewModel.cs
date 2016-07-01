@@ -14,28 +14,37 @@ namespace Auto.Core.Viewmodels
 {
 	public class MainViewModel : ReactiveObject
 	{
-		readonly DropTargetBase[] _targets =
-		{
-			new TestDropTarget(),
-			new PollinateDropTarget(),
-			new QuestionDropTarget(),
-			new ApproveDropTarget(),
-		};
+		readonly List<DropTargetBase> _allTargets;
+
 		readonly ReactiveList<DropTargetBase> _dropTargets = new ReactiveList<DropTargetBase>();
 
 		public MainViewModel()
 		{
 			GithubToken = Settings.Default.GithubToken;
 
+			_allTargets = GetType().Assembly.GetExportedTypes()
+				.Where(t => !t.IsAbstract)
+				.Where(t => typeof (DropTargetBase).IsAssignableFrom(t))
+				.OrderBy(x => x.Name)
+				.Select(t => (DropTargetBase) Activator.CreateInstance(t))
+				.ToList();
+
+
 			this.WhenAnyValue(x => x.HoveredUrl).Subscribe(x =>
 			{
 				using (_dropTargets.SuppressChangeNotifications())
 				{
 					_dropTargets.Clear();
-					_dropTargets.AddRange(_targets.Where(t => t.CanProcess(x)));
+					_dropTargets.AddRange(_allTargets.Where(t => t.CanProcess(x)));
 				}
 				State = DropTargets.Any() ? MainState.Expanded : MainState.Collapsed;
 
+			});
+
+			Quit = ReactiveCommand.CreateAsyncTask(x =>
+			{
+				Application.Current.Shutdown();
+				return Task.FromResult(Unit.Default);
 			});
 
 			SaveSettings = ReactiveCommand.CreateAsyncTask(x =>
@@ -57,11 +66,9 @@ namespace Auto.Core.Viewmodels
 		public string GithubToken { get; set; }
 
 		public ReactiveCommand<Unit> SaveSettings { get; }
+		public ReactiveCommand<Unit> Quit { get; }
 
-		public ICollection<DropTargetBase> DropTargets
-		{
-			get { return _dropTargets; }
-		}
+		public ICollection<DropTargetBase> DropTargets => _dropTargets;
 
 		public async void Process(DropTargetBase dc, string s)
 		{
